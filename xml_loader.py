@@ -5,6 +5,7 @@
 #import torch
 import os
 import xml.etree.ElementTree as ET
+import json
 
 
 # processing 1 xml file
@@ -18,6 +19,8 @@ def load_transcript(xml_file):
             transcript.append(word.text)
     return " ".join(transcript)
 
+# processing all json files
+
 def all_transcripts(path):
     transcripts = {}
     for file in os.listdir(path):
@@ -27,10 +30,19 @@ def all_transcripts(path):
             transcripts[m_id] = load_transcript(file_path)
     return transcripts
 
-path = "/Users/elizamg/Desktop/224nProject/ICSIplus/Words"
+path = "/Users/elizamg/Desktop/224nprojectgit/224nProject/ICSIplus/Words"
 
 transcripts = all_transcripts(path)
 
-for meeting, text in transcripts.items():
-    print(f"Meeting {meeting}:\n{text[:500]}...\n")
-    break
+# saving data
+def save_json(transcripts):
+    output_folder = "/Users/elizamg/Desktop/224nprojectgit/224nProject/transcripts"
+    os.makedirs(output_folder, exist_ok = True)
+
+    for meeting_id, transcript in transcripts.items():
+        file_path = os.path.join(output_folder, f"{meeting_id}.json")
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump({"meeting_id": meeting_id, "transcript": transcript}, f, indent=4)
+
+    print(f"Saved {len(transcripts)} transcripts as JSON.")
+save_json(transcripts)
